@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function translateText() {
     const inputText = document.getElementById('input-text').value;
-    const targetLanguage = 'fr'; // Change this to your desired target language code
+    const targetLanguage = document.getElementById('language-selector').value;
 
     fetch(`https://libretranslate.de/translate`, {
         method: 'POST',
