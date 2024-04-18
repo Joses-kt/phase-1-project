@@ -1,6 +1,16 @@
 document.addEventListener("DOMContentLoaded", function() {
+
+    //Event listener for translating text
     const translateButton = document.getElementById('translate-button');
     translateButton.addEventListener('click', translateText);
+
+    // Event listener for selecting a language
+    const languageSelector = document.getElementById('language-selector');
+    languageSelector.addEventListener('change', translateText);
+
+    // Event listener for toggling dark/light mode
+    const toggleModeButton = document.getElementById('toggle-mode-button');
+    toggleModeButton.addEventListener('click', toggleMode);
 });
 
 function translateText() {
@@ -8,11 +18,13 @@ function translateText() {
     const targetLanguage = document.getElementById('language-selector').value;
 
     fetch(`https://libretranslate.de/translate`, {
-        method: 'POST',
+       .then(res => res.JSON)
+    
+
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
+        body: JSON.parse({
             q: inputText,
             source: 'en', // Assuming input text is in English. Change if necessary.
             target: targetLanguage
@@ -36,4 +48,9 @@ function translateText() {
 function displayTranslation(translation) {
     const translationResult = document.getElementById('translation-result');
     translationResult.textContent = translation;
+}
+
+function toggleMode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
 }

@@ -17,3 +17,8 @@ h1 {
 #data-container {
     margin-top: 20px;
 }
+
+.dark-mode {
+    background-color: #222;
+    color: #fff;
+}
