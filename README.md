@@ -1,5 +1,5 @@
 # phase-1-project
-PROJECT- WEATHER APP
+PROJECT:WEATHER APP
 This project is a single page frontend application using HTML,CSS and JS.
 
 About:
