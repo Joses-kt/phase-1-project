@@ -1,56 +1,99 @@
-document.addEventListener("DOMContentLoaded", function() {
+function getWeather() {
+    const apiKey = 'YOUR-APIKEY';
+    const city = document.getElementById('city').value;
 
-    //Event listener for translating text
-    const translateButton = document.getElementById('translate-button');
-    translateButton.addEventListener('click', translateText);
+    if (!city) {
+        alert('Please enter a city');
+        return;
+    }
 
-    // Event listener for selecting a language
-    const languageSelector = document.getElementById('language-selector');
-    languageSelector.addEventListener('change', translateText);
+    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
 
-    // Event listener for toggling dark/light mode
-    const toggleModeButton = document.getElementById('toggle-mode-button');
-    toggleModeButton.addEventListener('click', toggleMode);
-});
-
-function translateText() {
-    const inputText = document.getElementById('input-text').value;
-    const targetLanguage = document.getElementById('language-selector').value;
-
-    fetch(`https://libretranslate.de/translate`, {
-       .then(res => res.JSON)
-    
-
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.parse({
-            q: inputText,
-            source: 'en', // Assuming input text is in English. Change if necessary.
-            target: targetLanguage
+    fetch(currentWeatherUrl)
+        .then(response => response.json())
+        .then(data => {
+            displayWeather(data);
         })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        const translatedText = data.translatedText;
-        displayTranslation(translatedText);
-    })
-    .catch(error => {
-        console.error('There was a problem with the translation request:', error);
+        .catch(error => {
+            console.error('Error fetching current weather data:', error);
+            alert('Error fetching current weather data. Please try again.');
+        });
+
+    fetch(forecastUrl)
+        .then(response => response.json())
+        .then(data => {
+            displayHourlyForecast(data.list);
+        })
+        .catch(error => {
+            console.error('Error fetching hourly forecast data:', error);
+            alert('Error fetching hourly forecast data. Please try again.');
+        });
+}
+
+function displayWeather(data) {
+    const tempDivInfo = document.getElementById('temp-div');
+    const weatherInfoDiv = document.getElementById('weather-info');
+    const weatherIcon = document.getElementById('weather-icon');
+    const hourlyForecastDiv = document.getElementById('hourly-forecast');
+
+    // Clear previous content
+    weatherInfoDiv.innerHTML = '';
+    hourlyForecastDiv.innerHTML = '';
+    tempDivInfo.innerHTML = '';
+
+    if (data.cod === '404') {
+        weatherInfoDiv.innerHTML = `<p>${data.message}</p>`;
+    } else {
+        const cityName = data.name;
+        const temperature = Math.round(data.main.temp - 273.15); // Convert to Celsius
+        const description = data.weather[0].description;
+        const iconCode = data.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+
+        const temperatureHTML = `
+            <p>${temperature}°C</p>
+        `;
+
+        const weatherHtml = `
+            <p>${cityName}</p>
+            <p>${description}</p>
+        `;
+
+        tempDivInfo.innerHTML = temperatureHTML;
+        weatherInfoDiv.innerHTML = weatherHtml;
+        weatherIcon.src = iconUrl;
+        weatherIcon.alt = description;
+
+        showImage();
+    }
+}
+
+function displayHourlyForecast(hourlyData) {
+    const hourlyForecastDiv = document.getElementById('hourly-forecast');
+
+    const next24Hours = hourlyData.slice(0, 8); // Display the next 24 hours (3-hour intervals)
+
+    next24Hours.forEach(item => {
+        const dateTime = new Date(item.dt * 1000); // Convert timestamp to milliseconds
+        const hour = dateTime.getHours();
+        const temperature = Math.round(item.main.temp - 273.15); // Convert to Celsius
+        const iconCode = item.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
+
+        const hourlyItemHtml = `
+            <div class="hourly-item">
+                <span>${hour}:00</span>
+                <img src="${iconUrl}" alt="Hourly Weather Icon">
+                <span>${temperature}°C</span>
+            </div>
+        `;
+
+        hourlyForecastDiv.innerHTML += hourlyItemHtml;
     });
 }
 
-function displayTranslation(translation) {
-    const translationResult = document.getElementById('translation-result');
-    translationResult.textContent = translation;
-}
-
-function toggleMode() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
+function showImage() {
+    const weatherIcon = document.getElementById('weather-icon');
+    weatherIcon.style.display = 'block'; // Make the image visible once it's loaded
 }
