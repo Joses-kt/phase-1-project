@@ -10,7 +10,7 @@ This is simple weather web app fetches real time data from the openwearher API.
 You should be able to get the current weather of the city of your choice and the time which is in 3hr intervals.
 
 AUTHOR:
-Joses.KT
+Joses-kt
 
 Installation:
 Use git clone to download the files from github.
